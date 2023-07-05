@@ -2,11 +2,12 @@ package main
 
 import (
 	"net/http/httputil"
-	rp "php-pods/reverse-proxy"
 )
 
+func onRequest(req *httputil.ProxyRequest) string {
+	return "http://localhost:8080"
+}
+
 func main() {
-	rp.Listen(func(req *httputil.ProxyRequest) string {
-		return "http://localhost:8080"
-	})
+	StartReverseProxy(onRequest)
 }
