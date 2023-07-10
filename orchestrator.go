@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http/httputil"
 	"regexp"
+	"strconv"
 )
 
 type Orchestrator struct {
@@ -18,17 +19,24 @@ func (o Orchestrator) bootstrap() {
 
 func (o Orchestrator) ResolveDstHostHandler(req *httputil.ProxyRequest) (string, error) {
 
-	// extract subdomain from host as the site name
+	// determine site name by host
 	siteName := o.subdomainMatcher.FindString(req.In.Host)
 
-	// handle sub domain errors
 	if siteName == "" {
-		return "", errors.New("could not determine site name")
+		return "", errors.New("could not determine subdomain for " + req.In.Host)
 	}
 
+	// trim separators
 	siteName = siteName[0 : len(siteName)-1]
 
-	log.Println("**** siteName", siteName)
+	// start container
+	port, err := SpawnContainer(siteName)
 
-	return "localhost:8080/", nil
+	if err != nil {
+		return "", err
+	}
+
+	log.Println("*** Spawn Container", siteName, port)
+
+	return "localhost" + strconv.Itoa(port), nil
 }

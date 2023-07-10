@@ -21,13 +21,15 @@ func StartReverseProxy(resolveDstHost ResolveDstHost) {
 		log.Println(req.In.Method, req.In.URL.String())
 
 		// use callback to get destination host
-		dstHost, error := resolveDstHost(req)
+		dstHost, err := resolveDstHost(req)
 
-		if error != nil {
-			req.Out.Write()
+		// cannot determine destination host
+		if err != nil {
+			notFoundUrl, _ := url.Parse("/404")
+			req.SetURL(notFoundUrl)
 		}
 
-		// set destination host
+		// change request URL to destination host
 		dstHostUrl, _ := url.Parse(dstHost)
 		req.SetURL(dstHostUrl)
 
