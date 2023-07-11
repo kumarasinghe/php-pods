@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"log"
 	"net/http/httputil"
 	"regexp"
 	"strconv"
@@ -35,8 +34,6 @@ func (o Orchestrator) ResolveDstHostHandler(req *httputil.ProxyRequest) (string,
 	if err != nil {
 		return "", err
 	}
-
-	log.Println("*** Spawn Container", siteName, port)
 
 	return "localhost" + strconv.Itoa(port), nil
 }

@@ -25,8 +25,10 @@ func StartReverseProxy(resolveDstHost ResolveDstHost) {
 
 		// cannot determine destination host
 		if err != nil {
-			notFoundUrl, _ := url.Parse("/404")
-			req.SetURL(notFoundUrl)
+			log.Println(err.Error())
+			//notFoundUrl, _ := url.Parse("/404")
+			//req.SetURL(notFoundUrl)
+			return
 		}
 
 		// change request URL to destination host
