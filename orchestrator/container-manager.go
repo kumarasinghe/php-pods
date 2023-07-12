@@ -3,15 +3,19 @@ package main
 import (
 	"errors"
 	"log"
+	"os"
 	"os/exec"
+	"path/filepath"
 	"strconv"
 )
 
-const PROJECT_ROOT = "C:\\Users\\NaveenKumarasinghe\\workspace\\php-pods\\sites"
+var workingDir, _ = os.Getwd()
+var projectRoot = filepath.Join(workingDir, "../")
+var containerPorts = make(map[string]int)
 
 func SpawnContainer(siteName string) (int, error) {
 
-	// obtain a random port
+	// TODO: obtain an unused port for the container
 	port := 8080
 
 	log.Println("spawning container", siteName, "on port", port, "...")
@@ -27,8 +31,7 @@ func SpawnContainer(siteName string) (int, error) {
 		"--publish",
 		strconv.Itoa(port)+":80",
 		"--volume",
-		// TODO: remove absolute path
-		PROJECT_ROOT+"\\"+siteName+":/var/www/default",
+		filepath.Join(projectRoot, "sites", siteName)+":/var/www/default",
 		"-d",
 		"ppp-wp",
 	)
@@ -37,7 +40,10 @@ func SpawnContainer(siteName string) (int, error) {
 
 	if err != nil {
 		return 0, errors.New("could not start container for " + siteName + " " + err.Error())
+
 	}
+
+	containerPorts[siteName] = port
 
 	return 0, nil
 
