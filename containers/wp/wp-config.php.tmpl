@@ -1,0 +1,55 @@
+<?php
+// ** Database settings ** //
+
+// Enable WP_DEBUG mode
+define( 'WP_DEBUG', true );
+
+// Enable Debug logging to the /wp-content/debug.log file
+define( 'WP_DEBUG_LOG', true );
+
+/** The name of the database for WordPress */
+define( 'DB_NAME', '$db_name' );
+
+/** Database username */
+define( 'DB_USER', '$db_user' );
+
+/** Database password */
+define( 'DB_PASSWORD', '$db_password' );
+
+/** Database hostname */
+define( 'DB_HOST', '$db_host' );
+
+/** Database charset to use in creating database tables. */
+define( 'DB_CHARSET', 'utf8mb4' );
+
+/** WordPress database table prefix. */
+$table_prefix = 'wp_';
+
+/**#@+
+ * Authentication unique keys and salts.
+ *
+ * Change these to different unique phrases! You can generate these using
+ * the {@link https://api.wordpress.org/secret-key/1.1/salt/ WordPress.org secret-key service}.
+ *
+ * You can change these at any point in time to invalidate all existing cookies.
+ * This will force all users to have to log in again.
+ *
+ * @since 2.6.0
+ */
+define( 'AUTH_KEY',         '(WxR<b~N#mqAP0$Z(:&{u]h{1YB%TsJ<S|HTJD<O>91)bCHhFNT=T-CdQ>3lpY}o' );
+define( 'SECURE_AUTH_KEY',  '% s5mCXylVYidh}9{!J^C{h/k]QojB[T8_Bve7jTR!$u[x-IAeer|;y3n?:iD%_w' );
+define( 'LOGGED_IN_KEY',    ';;mjpx!)[>2(KE_dsgGx[P$)H=s=$qr8>Qy*/{gZSney-.ASQ@>p^-S4#o1VFY8-' );
+define( 'NONCE_KEY',        'fs|t]igo$doW0o<t:f+pP{Z`tqp[&QPn?+>u:1T[C+/IhL<DeU{v(@lPHjw_v_cc' );
+define( 'AUTH_SALT',        '##_U??& @skZ,^lB+2-EvpIjcTcos$?O#E<uZ7/qk!^f_+)&8ud{XPuC8H6O<tw)' );
+define( 'SECURE_AUTH_SALT', '88X*#M=K;8tcdhP$TjakRB;{^80R_X.*ch>2,88_j7Pm_=1w468F^BZ-fD>|o3i(' );
+define( 'LOGGED_IN_SALT',   'k1I,,Qqb:/C|({/;AY!T!8rt1aw!lGI_p46hcSZfjl0((r(np!2%q(M*;`oT%kV<' );
+define( 'NONCE_SALT',       'hCSdS^Lib.PAVfRQ|V1yVahg@>*U#]X}Y4`rwNl]s9.&MDgW(}wcMigLJF^>YE%5' );
+
+/** Absolute path to the WordPress directory. */
+if ( ! defined( 'ABSPATH' ) ) {
+	define( 'ABSPATH', __DIR__ . '/' );
+}
+
+/** Sets up WordPress vars and included files. */
+require_once ABSPATH . 'wp-settings.php';
+
