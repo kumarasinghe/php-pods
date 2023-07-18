@@ -1,4 +1,4 @@
-PROJECT_ROOT = "C:/Users/NaveenKumarasinghe/workspace/php-pods"
+PROJECT_ROOT = "/Users/naveen/Workspace/php-pods"
 DB_ROOT_PASSWORD = "rootpass"
 
 # setup
@@ -19,11 +19,11 @@ install:
 	# create wordpress runtime image
 	docker build -t ppp-wp ./containers/wp
 
-start:
+up:
 	# start database container
 	docker start ppp-db
 
-stop:
+down:
 	# kill all containers
 	-docker kill `docker ps -q`
 
@@ -67,7 +67,7 @@ create-site:
 	db_name="${name}" \
 	db_user="${name}" \
 	db_password="${password}" \
-	db_host="wphub-db" \
+	db_host="ppp-db" \
 	envsubst '$$db_name,$$db_user,$$db_password,$$db_host' < "containers/wp/wp-config.php.tmpl" > "sites/${name}/wp-config.php"
 
 delete-site:

@@ -18,11 +18,11 @@ func (o Orchestrator) bootstrap() {
 
 func (o Orchestrator) ResolveDstHostHandler(req *httputil.ProxyRequest) (string, error) {
 
-	// determine site name by host
+	// determine site name by host subdomain
 	siteName := o.subdomainMatcher.FindString(req.In.Host)
 
 	if siteName == "" {
-		return "", errors.New("could not determine subdomain for " + req.In.Host)
+		return "", errors.New("could not determine site for " + req.In.Host)
 	}
 
 	// trim separators
@@ -35,5 +35,5 @@ func (o Orchestrator) ResolveDstHostHandler(req *httputil.ProxyRequest) (string,
 		return "", err
 	}
 
-	return "localhost" + strconv.Itoa(port), nil
+	return "http://localhost:" + strconv.Itoa(port), nil
 }

@@ -11,12 +11,13 @@ import (
 
 type ResolveDstHost func(*httputil.ProxyRequest) (string, error)
 
-const RETRY_TIMEOUT = 5000
+const retryTimeout = 5000
 
 func StartReverseProxy(resolveDstHost ResolveDstHost) {
 	reverseProxy := &httputil.ReverseProxy{}
 
 	reverseProxy.Rewrite = func(req *httputil.ProxyRequest) {
+
 		// log request
 		log.Println(req.In.Method, req.In.URL.String())
 
@@ -26,8 +27,8 @@ func StartReverseProxy(resolveDstHost ResolveDstHost) {
 		// cannot determine destination host
 		if err != nil {
 			log.Println(err.Error())
-			//notFoundUrl, _ := url.Parse("/404")
-			//req.SetURL(notFoundUrl)
+			notFoundUrl, _ := url.Parse("/404")
+			req.SetURL(notFoundUrl)
 			return
 		}
 
@@ -59,8 +60,8 @@ func StartReverseProxy(resolveDstHost ResolveDstHost) {
 		retryDuration := currentTime.Sub(retryStartTime)
 
 		// give up retrying if timeout has reached
-		if retryDuration.Milliseconds() >= RETRY_TIMEOUT {
-			log.Printf("Failed to connect to target host")
+		if retryDuration.Milliseconds() >= retryTimeout {
+			log.Println("proxy request timed out:", req.URL.String())
 			writer.WriteHeader(408)
 			return
 		}

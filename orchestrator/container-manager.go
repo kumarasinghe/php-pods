@@ -7,31 +7,47 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strconv"
+	"time"
 )
 
+type ContainerInfo struct {
+	port     int
+	lastUsed time.Time
+}
+
+var containerInfoMap = make(map[string]ContainerInfo)
 var workingDir, _ = os.Getwd()
 var projectRoot = filepath.Join(workingDir, "../")
-var containerPorts = make(map[string]int)
+var containerTimeout = time.Second * 30
 
-func SpawnContainer(siteName string) (int, error) {
+func SpawnContainer(name string) (int, error) {
+
+	containerInfo := containerInfoMap[name]
+
+	// if container exists prolong it
+	if containerInfo.port != 0 {
+		containerInfo.lastUsed = time.Now()
+		containerInfoMap[name] = containerInfo
+		return containerInfo.port, nil
+	}
 
 	// TODO: obtain an unused port for the container
 	port := 8080
 
-	log.Println("spawning container", siteName, "on port", port, "...")
+	log.Println("spawning container", name, "on port", port, "...")
 
 	cmd := exec.Command(
 		"docker",
 		"run",
 		"--rm",
 		"--name",
-		siteName,
+		name,
 		"--network",
 		"ppp",
 		"--publish",
 		strconv.Itoa(port)+":80",
 		"--volume",
-		filepath.Join(projectRoot, "sites", siteName)+":/var/www/default",
+		filepath.Join(projectRoot, "sites", name)+":/var/www/default",
 		"-d",
 		"ppp-wp",
 	)
@@ -39,12 +55,50 @@ func SpawnContainer(siteName string) (int, error) {
 	err := cmd.Run()
 
 	if err != nil {
-		return 0, errors.New("could not start container for " + siteName + " " + err.Error())
-
+		return 0, errors.New("failed to start container: " + name)
 	}
 
-	containerPorts[siteName] = port
+	containerInfoMap[name] = ContainerInfo{port: port, lastUsed: time.Now()}
 
-	return 0, nil
+	return port, nil
 
+}
+
+func containerTerminateRoutine() {
+
+	for {
+		// kill containers which met timeout
+		for containerName, containerInfo := range containerInfoMap {
+
+			// skip if timeout has not met
+			if time.Since(containerInfo.lastUsed) < containerTimeout {
+				continue
+			}
+
+			// execute kill command
+			cmd := exec.Command(
+				"docker",
+				"kill",
+				containerName,
+			)
+
+			err := cmd.Run()
+
+			delete(containerInfoMap, containerName)
+
+			if err != nil {
+				log.Println("failed to terminate idle container", containerName, err.Error())
+				continue
+			}
+
+			log.Println("terminated idle container:", containerName)
+
+		}
+
+		time.Sleep(time.Second)
+	}
+}
+
+func init() {
+	go containerTerminateRoutine()
 }
