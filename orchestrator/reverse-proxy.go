@@ -6,6 +6,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -18,9 +19,6 @@ func StartReverseProxy(resolveDstHost ResolveDstHost) {
 
 	reverseProxy.Rewrite = func(req *httputil.ProxyRequest) {
 
-		// log request
-		log.Println(req.In.Method, req.In.URL.String())
-
 		// use callback to get destination host
 		dstHost, err := resolveDstHost(req)
 
@@ -30,6 +28,11 @@ func StartReverseProxy(resolveDstHost ResolveDstHost) {
 			notFoundUrl, _ := url.Parse("/404")
 			req.SetURL(notFoundUrl)
 			return
+		}
+
+		// log external requests
+		if !strings.Contains(req.In.URL.String(), dstHost) {
+			log.Println(req.In.Method, req.In.URL.String())
 		}
 
 		// change request URL to destination host
